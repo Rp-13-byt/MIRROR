@@ -1,0 +1,12 @@
+{
+  "model": "mirror_pattern_v1.onnx",
+  "execution_provider": "AzureExecutionProvider",
+  "initialization_time_ms": 14.77,
+  "warmup_latency_ms": 4.65,
+  "steady_state_p50_ms": 0.02,
+  "steady_state_p90_ms": 0.03,
+  "steady_state_p95_ms": 0.04,
+  "mean_latency_ms": 0.03,
+  "iterations": 100,
+  "process_memory_rss_mb": 66.33
+}

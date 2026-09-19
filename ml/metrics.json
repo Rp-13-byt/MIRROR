@@ -1,0 +1,81 @@
+{
+  "model_name": "mirror_pattern_cnn",
+  "accuracy": 1.0,
+  "macro_f1": 1.0,
+  "class_metrics": {
+    "NORMAL": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 68
+    },
+    "HIGH_SWITCHING": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 53
+    },
+    "EXTENDED_SESSION": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 54
+    },
+    "RAPID_REOPEN": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 68
+    },
+    "LATE_NIGHT_OR_SCROLL_LIKE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 57
+    }
+  },
+  "confusion_matrix": [
+    [
+      68,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      53,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      54,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      68,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      57
+    ]
+  ],
+  "classes": [
+    "NORMAL",
+    "HIGH_SWITCHING",
+    "EXTENDED_SESSION",
+    "RAPID_REOPEN",
+    "LATE_NIGHT_OR_SCROLL_LIKE"
+  ]
+}

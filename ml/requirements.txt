@@ -1,0 +1,7 @@
+# Mirror Edge-AI Machine Learning Requirements
+# Compatible with Windows on ARM64 and Windows x64
+torch>=2.0.0
+numpy>=1.24.0
+onnx>=1.15.0
+onnxruntime>=1.16.0
+matplotlib>=3.7.0

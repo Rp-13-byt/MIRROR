@@ -1,0 +1,92 @@
+<Page
+    x:Class="Mirror_App.Views.PrivacyPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="24" HorizontalAlignment="Stretch" Margin="8,0,32,32">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Privacy &amp; Data Governance" FontSize="26" FontWeight="Bold" />
+                <TextBlock Text="Architectural proof that your behavioral telemetry never leaves your device." FontSize="14" Foreground="#888888" />
+            </StackPanel>
+
+            <!-- Status Banner -->
+            <Border Background="#15107C41" BorderBrush="#33107C41" BorderThickness="1" CornerRadius="8" Padding="18">
+                <Grid ColumnDefinitions="Auto, *">
+                    <FontIcon Grid.Column="0" Glyph="&#xE72E;" FontSize="24" Foreground="#107C41" Margin="0,0,16,0" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock Text="OFFLINE GUARANTEE: ZERO NETWORK TRAFFIC" FontSize="15" FontWeight="Bold" Foreground="#107C41" />
+                        <TextBlock Text="Mirror contains zero cloud SDKs, zero telemetry endpoints, and zero remote analytics. All machine learning inference executes on local hardware." FontSize="13" Foreground="#CCCCCC" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Data Collection Audit Table -->
+            <Border Background="#0CFFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Telemetry Field Audit" FontSize="18" FontWeight="SemiBold" />
+                    
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="2*, 3*, Auto" RowSpacing="12">
+                        <!-- Header -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="DATA FIELD" FontWeight="Bold" Foreground="#888888" FontSize="11" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="ARCHITECTURAL POLICY" FontWeight="Bold" Foreground="#888888" FontSize="11" />
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="STATUS" FontWeight="Bold" Foreground="#888888" FontSize="11" />
+
+                        <!-- Window Titles -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Window Titles / Web Page Titles" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Never accessed. SetWinEventHook intercepts only process handle." Foreground="#AAAAAA" VerticalAlignment="Center" />
+                        <Border Grid.Row="1" Grid.Column="2" Background="#20D83B01" CornerRadius="4" Padding="6,2">
+                            <TextBlock Text="REJECTED AT HOOK" FontSize="10" FontWeight="Bold" Foreground="#D83B01" />
+                        </Border>
+
+                        <!-- URLs -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Browser URLs &amp; History" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="Never accessed. Zero browser extensions or DOM accessibility inspection." Foreground="#AAAAAA" VerticalAlignment="Center" />
+                        <Border Grid.Row="2" Grid.Column="2" Background="#20D83B01" CornerRadius="4" Padding="6,2">
+                            <TextBlock Text="NOT COLLECTED" FontSize="10" FontWeight="Bold" Foreground="#D83B01" />
+                        </Border>
+
+                        <!-- Keystrokes -->
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Keystrokes &amp; Text Input" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="Never logged. GetLastInputInfo reads system idle tick count only." Foreground="#AAAAAA" VerticalAlignment="Center" />
+                        <Border Grid.Row="3" Grid.Column="2" Background="#20D83B01" CornerRadius="4" Padding="6,2">
+                            <TextBlock Text="ZERO KEYSTROKES" FontSize="10" FontWeight="Bold" Foreground="#D83B01" />
+                        </Border>
+
+                        <!-- Screen Captures -->
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Screen Captures / OCR" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="Zero screen capture APIs or image buffers." Foreground="#AAAAAA" VerticalAlignment="Center" />
+                        <Border Grid.Row="4" Grid.Column="2" Background="#20D83B01" CornerRadius="4" Padding="6,2">
+                            <TextBlock Text="ZERO CAPTURE" FontSize="10" FontWeight="Bold" Foreground="#D83B01" />
+                        </Border>
+
+                        <!-- Executable Name -->
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Foreground Process &amp; Timestamps" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="Canonical process executable name and session start/end times." Foreground="#AAAAAA" VerticalAlignment="Center" />
+                        <Border Grid.Row="5" Grid.Column="2" Background="#20107C41" CornerRadius="4" Padding="6,2">
+                            <TextBlock Text="LOCAL ENCRYPTED" FontSize="10" FontWeight="Bold" Foreground="#107C41" />
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Export & Data Control -->
+            <Border Background="#0CFFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Data Ownership &amp; Export" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock x:Name="TxtStatusMessage" Text="" FontSize="13" Foreground="#0078D4" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button x:Name="BtnExportCsv" Content="Export Data to CSV" Click="OnExportCsvClicked" />
+                        <Button x:Name="BtnExportJson" Content="Export Data to JSON" Click="OnExportJsonClicked" />
+                        <Button x:Name="BtnDeleteToday" Content="Delete Today's Data" Click="OnDeleteTodayClicked" />
+                        <Button x:Name="BtnPurgeAll" Content="Nuclear Purge (Reset DB)" Click="OnPurgeAllClicked" Background="#33D83B01" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

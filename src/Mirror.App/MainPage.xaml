@@ -1,0 +1,89 @@
+<Page
+    x:Class="Mirror_App.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Mirror_App"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid RowDefinitions="Auto, *">
+        <!-- Top Status & Hardware Bar -->
+        <Border Grid.Row="0" Background="#11000000" BorderBrush="#22888888" BorderThickness="0,0,0,1" Padding="16,8">
+            <Grid ColumnDefinitions="Auto, *, Auto, Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <!-- Privacy Badge -->
+                    <Border Background="#100078D4" BorderBrush="#330078D4" BorderThickness="1" CornerRadius="12" Padding="10,4">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE72E;" FontSize="12" Foreground="#0078D4" />
+                            <TextBlock Text="100% On-Device — Zero Cloud" FontSize="11" FontWeight="SemiBold" Foreground="#0078D4" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- NPU Hardware Badge -->
+                    <Border Background="#10107C41" BorderBrush="#33107C41" BorderThickness="1" CornerRadius="12" Padding="10,4">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE950;" FontSize="12" Foreground="#107C41" />
+                            <TextBlock x:Name="TxtHardwareBadge" Text="Snapdragon NPU / QNN (Hexagon)" FontSize="11" FontWeight="SemiBold" Foreground="#107C41" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Demo Mode Toggle & Status -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <Border x:Name="DemoBadge" Background="#20FFB900" BorderBrush="#44FFB900" BorderThickness="1" CornerRadius="12" Padding="8,4">
+                        <TextBlock Text="DEMO MODE ACTIVE" FontSize="10" FontWeight="Bold" Foreground="#D88F00" />
+                    </Border>
+                    <ToggleSwitch x:Name="ToggleDemoSwitch" OffContent="Live Tracking" OnContent="Demo Mode" Toggled="OnDemoToggled" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button x:Name="BtnTrackingToggle" Content="Tracking: Active" Click="OnTrackingClicked" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Navigation View -->
+        <NavigationView x:Name="NavView" Grid.Row="1" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed" SelectionChanged="OnNavSelectionChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Overview" Tag="overview">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE80F;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Timeline" Tag="timeline">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE823;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Behavioral Patterns" Tag="patterns">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Trends &amp; Baseline" Tag="trends">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D2;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Privacy Audit" Tag="privacy">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8D7;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="NPU &amp; Diagnostics" Tag="diagnostics">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE950;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <Frame x:Name="ContentFrame" Margin="16" />
+        </NavigationView>
+    </Grid>
+</Page>

@@ -1,0 +1,32 @@
+{
+  "model_name": "mirror_pattern",
+  "version": "1.0.0",
+  "input_shape": [
+    1,
+    60,
+    10
+  ],
+  "quantized": false,
+  "training_dataset": "synthetic-v1",
+  "feature_schema": 1,
+  "sha256": "9139618ba7a86598811c96d027e537746f62a63cc22431b811c075aca2f4a5a2",
+  "features": [
+    "active_seconds",
+    "switch_count",
+    "unique_apps",
+    "reopen_count",
+    "longest_session_seconds",
+    "top_app_share",
+    "app_entropy",
+    "late_night_ratio",
+    "single_app_ratio",
+    "category_diversity"
+  ],
+  "classes": [
+    "NORMAL",
+    "HIGH_SWITCHING",
+    "EXTENDED_SESSION",
+    "RAPID_REOPEN",
+    "LATE_NIGHT_OR_SCROLL_LIKE"
+  ]
+}

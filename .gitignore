@@ -1,0 +1,56 @@
+## Visual Studio / .NET Build Artifacts
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+*.pidb
+*.booproj
+*.svclog
+
+## Windows App SDK / WinUI 3
+Generated Files/
+x64/
+x86/
+ARM64/
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+
+## Local Databases & Runtime Storage
+*.db-shm
+*.db-wal
+*.mirrorwallet
+*.local.db
+
+## Test & Coverage Results
+TestResults/
+coverage/
+*.trx
+*.log
+stdout.txt
+stderr.txt
+
+## Office Temp Files
+~$*
+
+## Python Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+## OS Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/

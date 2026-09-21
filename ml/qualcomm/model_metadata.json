@@ -1,0 +1,59 @@
+{
+  "qualcomm_ai_hub": {
+    "hub_version": "0.19.0",
+    "target_runtime": "ONNX Runtime with QNN EP (v2.28+)",
+    "target_hardware": "Qualcomm Snapdragon X Elite / Hexagon NPU (45 TOPS)",
+    "compatible_hardware": [
+      "Snapdragon X Elite (X1E-84-100 / X1E-80-100 / X1E-78-100)",
+      "Snapdragon X Plus (X1P-64-100)",
+      "Snapdragon 8cx Gen 3",
+      "x86_64 CPU Fallback",
+      "DirectML GPU Fallback"
+    ]
+  },
+  "models": {
+    "behavioral_classifier": {
+      "model_id": "mirror_pattern_v1",
+      "model_type": "sequence_classifier",
+      "description": "Continuous 60-minute window activity classifier detecting fragmentation, switching bursts, and sustained focus",
+      "framework": "PyTorch / ONNX",
+      "input_shape": [1, 60, 10],
+      "input_name": "activity_sequence",
+      "output_shape": [1, 4],
+      "output_name": "pattern_probabilities",
+      "quantization": "INT8 QDQ (QuantizeLinear / DequantizeLinear)",
+      "precision": "INT8 / FP32 fallback",
+      "onnx_file": "ml/models/mirror_pattern_v1.onnx",
+      "qdq_onnx_file": "ml/models/mirror_pattern_v1.qdq.onnx",
+      "performance_targets": {
+        "npu_latency_p50_ms": 1.4,
+        "npu_latency_p95_ms": 2.1,
+        "cpu_latency_p50_ms": 18.7,
+        "power_npu_mw": 140,
+        "power_cpu_mw": 2800,
+        "npu_efficiency_gain": "13.3x latency, 20x power efficiency"
+      }
+    },
+    "mirror_copilot": {
+      "model_id": "qwen2.5-0.5b-instruct",
+      "model_family": "Qwen2.5",
+      "parameter_count": "490M",
+      "hub_source": "Qualcomm AI Hub Model Zoo / HuggingFace",
+      "description": "Grounded natural language interface for local activity facts, summaries, and trend explanations",
+      "quantization": "INT4 block-quantized weights with FP16 activations (optimized for Hexagon NPU)",
+      "context_window_tokens": 1024,
+      "max_generated_tokens": 128,
+      "temperature": 0.1,
+      "top_p": 0.9,
+      "presence_penalty": 0.0,
+      "grounding_strictness": "Absolute deterministic fact-grounded. Refuses speculative or clinical prompts.",
+      "performance_targets": {
+        "npu_ttft_ms": 68,
+        "npu_generation_tps": 42.5,
+        "cpu_ttft_ms": 340,
+        "cpu_generation_tps": 11.2,
+        "npu_efficiency_gain": "5.0x TTFT, 3.8x throughput"
+      }
+    }
+  }
+}

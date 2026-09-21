@@ -67,6 +67,8 @@ public static class AppServices
         services.AddSingleton<Mirror.Reporting.IPdfReportService, Mirror.Reporting.PdfReportService>();
         services.AddSingleton<Mirror.Voice.LocalVoiceNarrator>();
         services.AddSingleton<Mirror.LLM.ILocalLlmService, Mirror.LLM.LocalLlmService>();
+        services.AddSingleton<Mirror.LLM.Copilot.IAiHubModelRuntime, Mirror.LLM.Copilot.AiHubModelRuntime>();
+        services.AddSingleton<Mirror.LLM.Copilot.IMirrorCopilotService, Mirror.LLM.Copilot.MirrorCopilotService>();
 
         // Inference
         services.AddSingleton<IInferenceBackendManager, InferenceBackendManager>();
@@ -87,6 +89,7 @@ public static class AppServices
         services.AddTransient<PrivacyViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<DiagnosticsViewModel>();
+        services.AddTransient<CopilotViewModel>();
 
         _serviceProvider = services.BuildServiceProvider();
 

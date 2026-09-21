@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Mirror_App.Services;
@@ -17,8 +17,8 @@ public sealed partial class DiagnosticsPage : Page
         DataContext = ViewModel;
 
         TxtBackend.Text = ViewModel.ActiveBackendName;
+        TxtSoc.Text = ViewModel.SocArchitecture;
         TxtMemory.Text = ViewModel.MemoryFootprint;
-        TxtDbSize.Text = ViewModel.DatabaseSize;
         TxtLatency.Text = ViewModel.LastInferenceLatency;
     }
 

@@ -47,6 +47,9 @@ public sealed partial class MainPage : Page
                 case "overview":
                     ContentFrame.Navigate(typeof(OverviewPage));
                     break;
+                case "copilot":
+                    ContentFrame.Navigate(typeof(CopilotPage));
+                    break;
                 case "timeline":
                     ContentFrame.Navigate(typeof(TimelinePage));
                     break;

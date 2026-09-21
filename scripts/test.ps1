@@ -27,7 +27,8 @@ $testProjects = @(
     (Join-Path $rootDir "tests\Mirror.Persistence.Tests\Mirror.Persistence.Tests.csproj"),
     (Join-Path $rootDir "tests\Mirror.Analytics.Tests\Mirror.Analytics.Tests.csproj"),
     (Join-Path $rootDir "tests\Mirror.Inference.Tests\Mirror.Inference.Tests.csproj"),
-    (Join-Path $rootDir "tests\Mirror.Privacy.Tests\Mirror.Privacy.Tests.csproj")
+    (Join-Path $rootDir "tests\Mirror.Privacy.Tests\Mirror.Privacy.Tests.csproj"),
+    (Join-Path $rootDir "tests\Mirror.AI.Tests\Mirror.AI.Tests.csproj")
 )
 
 $totalPassed = 0

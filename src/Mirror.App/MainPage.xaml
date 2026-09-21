@@ -52,6 +52,12 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
+                <NavigationViewItem Content="Ask Mirror" Tag="copilot">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE99A;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
                 <NavigationViewItem Content="Timeline" Tag="timeline">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE823;" />

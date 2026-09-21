@@ -1,0 +1,118 @@
+<Page
+    x:Class="Mirror_App.Views.CopilotPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid RowDefinitions="Auto, Auto, *, Auto" Margin="8,0,24,16" RowSpacing="12">
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Ask Mirror — Local Intelligence Copilot" FontSize="26" FontWeight="Bold" />
+                <TextBlock Text="Natural language reasoning grounded exclusively in local SQLite facts. Powered by Qualcomm AI Hub." FontSize="14" Foreground="#888888" />
+            </StackPanel>
+
+            <!-- Hardware Badge -->
+            <Border Grid.Column="1" Background="#15107C41" BorderBrush="#33107C41" BorderThickness="1" CornerRadius="16" Padding="14,6" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <FontIcon Glyph="&#xE950;" FontSize="14" Foreground="#107C41" />
+                    <TextBlock x:Name="TxtBackendBadge" Text="Qualcomm Snapdragon NPU (QNN EP)" FontSize="12" FontWeight="SemiBold" Foreground="#107C41" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Quick Query Chips Bar & Transparency Banner -->
+        <StackPanel Grid.Row="1" Spacing="10">
+            <!-- Quick Chips -->
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Quick Inquiries:" VerticalAlignment="Center" FontSize="12" Foreground="#888888" Margin="0,0,4,0" />
+                    <Button Content="Summarize today" Click="OnQuickChipClicked" Background="#11FFFFFF" CornerRadius="14" Padding="12,4" FontSize="12" />
+                    <Button Content="Compare with yesterday" Click="OnQuickChipClicked" Background="#11FFFFFF" CornerRadius="14" Padding="12,4" FontSize="12" />
+                    <Button Content="Show longest session" Click="OnQuickChipClicked" Background="#11FFFFFF" CornerRadius="14" Padding="12,4" FontSize="12" />
+                    <Button Content="Any late-night usage?" Click="OnQuickChipClicked" Background="#11FFFFFF" CornerRadius="14" Padding="12,4" FontSize="12" />
+                    <Button Content="What does Mirror store?" Click="OnQuickChipClicked" Background="#11FFFFFF" CornerRadius="14" Padding="12,4" FontSize="12" />
+                    <Button Content="Am I burned out?" Click="OnQuickChipClicked" Background="#15D83B01" Foreground="#FF8C00" CornerRadius="14" Padding="12,4" FontSize="12" ToolTipService.ToolTip="Tests the strict non-clinical safety interception guard" />
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Privacy Guarantee Banner -->
+            <Border Background="#080078D4" BorderBrush="#220078D4" BorderThickness="1" CornerRadius="8" Padding="12,8">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <FontIcon Grid.Column="0" Glyph="&#xE72E;" FontSize="14" Foreground="#0078D4" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <TextBlock Grid.Column="1" Text="Privacy Guarantee: Queries never leave this device. No network requests, zero telemetry. Model runs on local NPU/CPU." FontSize="12" Foreground="#CCCCCC" VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Content="Clear Conversation" Click="OnClearChatClicked" FontSize="11" Padding="8,4" Background="Transparent" BorderBrush="#33888888" />
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- Chat Conversation Area -->
+        <ScrollViewer x:Name="ChatScrollViewer" Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="MessagesList" ItemsSource="{Binding Messages}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,8">
+                            <!-- User Message -->
+                            <StackPanel HorizontalAlignment="Right" MaxWidth="620" Visibility="{Binding UserVisibility}">
+                                <Border Background="#0078D4" CornerRadius="14,14,2,14" Padding="14,10">
+                                    <TextBlock Text="{Binding Text}" Foreground="White" FontSize="14" TextWrapping="Wrap" />
+                                </Border>
+                                <TextBlock Text="{Binding FormattedTime}" FontSize="10" Foreground="#666666" HorizontalAlignment="Right" Margin="0,2,4,0" />
+                            </StackPanel>
+
+                            <!-- Copilot Message -->
+                            <StackPanel HorizontalAlignment="Left" MaxWidth="720" Spacing="6" Visibility="{Binding CopilotVisibility}">
+                                <Border Background="#12FFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="14,14,14,2" Padding="16,12">
+                                    <StackPanel Spacing="8">
+                                        <!-- Header Pill -->
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE99A;" FontSize="13" Foreground="#0078D4" />
+                                            <TextBlock Text="Mirror Copilot" FontSize="12" FontWeight="SemiBold" Foreground="#0078D4" />
+                                            <TextBlock Text="•" Foreground="#555555" />
+                                            <TextBlock Text="{Binding BackendDisplayName}" FontSize="11" Foreground="#107C41" />
+                                            <TextBlock Text="•" Foreground="#555555" />
+                                            <TextBlock Text="{Binding FormattedTime}" FontSize="11" Foreground="#666666" />
+                                        </StackPanel>
+
+                                        <!-- Message Content -->
+                                        <TextBlock Text="{Binding Text}" FontSize="14" Foreground="#E0E0E0" TextWrapping="Wrap" />
+
+                                        <!-- Refusal Notice if triggered -->
+                                        <Border Visibility="{Binding RefusalVisibility}" Background="#15D83B01" BorderBrush="#33D83B01" BorderThickness="1" CornerRadius="6" Padding="10,6">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon Glyph="&#xE7BA;" FontSize="12" Foreground="#D83B01" />
+                                                <TextBlock Text="Non-Clinical Safety Guard Active: Speculative psychological diagnosis is architecturally refused." FontSize="11" Foreground="#FFA07A" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Evidence Toggle Button -->
+                                        <Button Content="Show Grounded Evidence (Local Facts)" Command="{Binding ToggleEvidenceCommand}" FontSize="11" Padding="8,4" Background="#15FFFFFF" BorderThickness="0" CornerRadius="6" />
+
+                                        <!-- Grounded Facts Card -->
+                                        <Border Visibility="{Binding EvidenceVisibility}" Background="#1A000000" BorderBrush="#330078D4" BorderThickness="1" CornerRadius="8" Padding="12,10">
+                                            <StackPanel Spacing="6">
+                                                <TextBlock Text="GROUNDED LOCAL FACTS (Context Provided to Model):" FontSize="10" FontWeight="Bold" Foreground="#0078D4" />
+                                                <TextBlock Text="{Binding GroundedFactsSummary}" FontSize="12" Foreground="#CCCCCC" TextWrapping="Wrap" />
+                                                <TextBlock Text="Data Source: Local SQLite Encrypted WAL (Zero Cloud Leakage)" FontSize="10" Foreground="#777777" FontStyle="Italic" Margin="0,4,0,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Bottom Query Bar -->
+        <Border Grid.Row="3" Background="#11FFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="12" Padding="8">
+            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="8">
+                <TextBox x:Name="TxtQuery" PlaceholderText="Ask Mirror about your activity, patterns, or data privacy..." KeyDown="OnQueryKeyDown" BorderThickness="0" Background="Transparent" FontSize="14" VerticalAlignment="Center" />
+                <Button x:Name="BtnSend" Grid.Column="1" Content="Ask Mirror" Click="OnSendClicked" Background="#0078D4" Foreground="White" CornerRadius="8" Padding="16,8" FontWeight="SemiBold" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

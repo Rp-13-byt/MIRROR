@@ -24,6 +24,18 @@
                 </Grid>
             </Border>
 
+            <!-- Privacy Audit Verification -->
+            <Border Background="#0CFFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*, Auto">
+                        <TextBlock Grid.Column="0" Text="Runtime Privacy Audit" FontSize="18" FontWeight="SemiBold" />
+                        <Button Grid.Column="1" Content="Re-Scan Assemblies" Click="OnRunAuditClicked" />
+                    </Grid>
+                    <TextBlock x:Name="TxtAuditSummary" Text="{x:Bind ViewModel.PrivacyAuditSummary, Mode=OneWay}" FontSize="13" Foreground="#107C41" />
+                    <TextBlock Text="Scans all loaded Mirror assemblies to verify zero forbidden socket/HTTP references and strict adherence to the forbidden fields policy." FontSize="12" Foreground="#888888" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
             <!-- Data Collection Audit Table -->
             <Border Background="#0CFFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="8" Padding="20">
                 <StackPanel Spacing="16">
@@ -73,11 +85,61 @@
                 </StackPanel>
             </Border>
 
+            <!-- Data State & Inventory -->
+            <Border Background="#0CFFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="16">
+                    <Grid ColumnDefinitions="*, Auto">
+                        <TextBlock Grid.Column="0" Text="Current Data State &amp; Inventory" FontSize="18" FontWeight="SemiBold" />
+                        <Button Grid.Column="1" Content="Refresh Counts" Click="OnRefreshInventoryClicked" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*, *, *" RowDefinitions="Auto, Auto" RowSpacing="12" ColumnSpacing="16">
+                        <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
+                            <TextBlock Text="DATABASE INTEGRITY" FontSize="11" Foreground="#888888" FontWeight="Bold" />
+                            <TextBlock Text="{x:Bind ViewModel.DatabaseIntegrityStatus, Mode=OneWay}" FontSize="13" Foreground="#107C41" FontWeight="Medium" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2">
+                            <TextBlock Text="DATABASE SIZE ON DISK" FontSize="11" Foreground="#888888" FontWeight="Bold" />
+                            <TextBlock Text="{x:Bind ViewModel.DatabaseSizeFormatted, Mode=OneWay}" FontSize="13" FontWeight="Medium" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="2" Spacing="2">
+                            <TextBlock Text="TOTAL STORED RECORDS" FontSize="11" Foreground="#888888" FontWeight="Bold" />
+                            <TextBlock Text="{x:Bind ViewModel.TotalRecordCount, Mode=OneWay}" FontSize="13" FontWeight="Bold" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2">
+                            <TextBlock Text="SESSIONS &amp; SWITCHES" FontSize="11" Foreground="#888888" FontWeight="Bold" />
+                            <TextBlock Text="{x:Bind ViewModel.SessionCount, Mode=OneWay}" FontSize="13" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
+                            <TextBlock Text="BEHAVIORAL PATTERNS" FontSize="11" Foreground="#888888" FontWeight="Bold" />
+                            <TextBlock Text="{x:Bind ViewModel.PatternEventCount, Mode=OneWay}" FontSize="13" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="2" Spacing="2">
+                            <TextBlock Text="FLOW &amp; FOCUS SESSIONS" FontSize="11" Foreground="#888888" FontWeight="Bold" />
+                            <TextBlock Text="{x:Bind ViewModel.FocusSessionCount, Mode=OneWay}" FontSize="13" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Deletion Preview Banner -->
+            <Border x:Name="DeletionPreviewPanel" Visibility="{x:Bind ViewModel.IsDeletionPreviewVisible, Mode=OneWay}" Background="#22D83B01" BorderBrush="#88D83B01" BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="CONFIRM PERMANENT DATA PURGE" FontWeight="Bold" Foreground="#D83B01" />
+                    <TextBlock Text="{x:Bind ViewModel.DeletionPreviewMessage, Mode=OneWay}" Foreground="#CCCCCC" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Content="Yes, Purge Everything Now" Click="OnConfirmPurgeClicked" Background="#D83B01" Foreground="White" />
+                        <Button Content="Cancel" Click="OnCancelPurgeClicked" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <!-- Export & Data Control -->
             <Border Background="#0CFFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="8" Padding="20">
                 <StackPanel Spacing="16">
                     <TextBlock Text="Data Ownership &amp; Export" FontSize="18" FontWeight="SemiBold" />
-                    <TextBlock x:Name="TxtStatusMessage" Text="" FontSize="13" Foreground="#0078D4" />
+                    <TextBlock x:Name="TxtStatusMessage" Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" FontSize="13" Foreground="#0078D4" />
 
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <Button x:Name="BtnExportCsv" Content="Export Data to CSV" Click="OnExportCsvClicked" />

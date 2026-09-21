@@ -73,6 +73,9 @@ public record InferenceResult
     public required float[] ClassProbabilities { get; init; }
     public double InferenceTimeMs { get; init; }
     public required string ModelVersion { get; init; }
+    public bool IsUncertain { get; init; }
+    public string? AbstentionReason { get; init; }
+    public TimeSpan InferenceDuration => TimeSpan.FromMilliseconds(InferenceTimeMs);
 }
 
 public record ModelMetadata

@@ -1,3 +1,4 @@
+using Mirror.Core.Domain;
 using Mirror.Core.Models;
 
 namespace Mirror.Core.Interfaces;
@@ -46,6 +47,27 @@ public interface IMirrorRepository
     Task UpsertRecalibratedThresholdAsync(string thresholdKey, double value, CancellationToken ct = default);
     Task<IReadOnlyDictionary<string, double>> GetRecalibratedThresholdsAsync(CancellationToken ct = default);
     Task ResetRecalibratedThresholdsAsync(CancellationToken ct = default);
+
+    // Focus Sessions
+    Task InsertFocusSessionAsync(FocusSession session, CancellationToken ct = default);
+    Task<IReadOnlyList<FocusSession>> GetFocusSessionsAsync(DateTime startUtc, DateTime endUtc, CancellationToken ct = default);
+
+    // User Contexts
+    Task<IReadOnlyList<UserContext>> GetUserContextsAsync(CancellationToken ct = default);
+    Task<long> InsertUserContextAsync(string name, CancellationToken ct = default);
+    Task DeleteUserContextAsync(long contextId, CancellationToken ct = default);
+    Task AssignAppContextAsync(string appKey, long contextId, CancellationToken ct = default);
+    Task<long?> GetAppContextAsync(string appKey, CancellationToken ct = default);
+
+    // Pattern Preferences
+    Task<IReadOnlyList<PatternPreference>> GetPatternPreferencesAsync(CancellationToken ct = default);
+    Task SavePatternPreferenceAsync(BehavioralPatternType patternType, PatternVisibility visibility, CancellationToken ct = default);
+
+    // Data Inventory & Integrity
+    Task<DataInventoryCounts> GetDataInventoryCountsAsync(CancellationToken ct = default);
+    Task<bool> CheckDatabaseIntegrityAsync(CancellationToken ct = default);
+    Task RecordHeartbeatAsync(bool isClean, CancellationToken ct = default);
+    Task<bool> WasLastShutdownCleanAsync(CancellationToken ct = default);
 }
 
 
@@ -61,6 +83,13 @@ public interface IPrivacyGuard
     void ValidateSafeEntity<T>(T entity);
     bool IsFieldForbidden(string fieldName);
     IReadOnlyList<string> ScanObjectForViolations(object obj);
+}
+
+public interface IPrivacyEnforcementGate
+{
+    CanonicalActivityEvent? SanitizeAndFilter(string processName, DateTime timestampUtc);
+    bool IsAllowedField(string fieldName);
+    void AssertForbiddenFieldAbsence(object payload);
 }
 
 public interface IWalletService

@@ -45,6 +45,10 @@ public record PatternEvent
     public bool ModelSignal { get; init; }
     public float ModelConfidence { get; init; }
     public required string Explanation { get; init; }
+    public int SwitchCount { get; init; }
+    public int UniqueApps { get; init; }
+    public int DurationSeconds { get; init; }
+    public double LateNightMinutes { get; init; }
 }
 
 public record DailyMetrics
@@ -117,4 +121,98 @@ public record RecalibratedThreshold
     public double Value { get; init; }
     public DateTime UpdatedUtc { get; init; } = DateTime.UtcNow;
 }
+
+public record CanonicalActivityEvent(
+    string AppKey,
+    string DisplayName,
+    string Category,
+    DateTime TimestampUtc
+);
+
+public record FocusSession
+{
+    public long Id { get; init; }
+    public DateTime StartUtc { get; init; }
+    public DateTime EndUtc { get; init; }
+    public int PlannedDurationSeconds { get; init; }
+    public int ActualDurationSeconds { get; init; }
+    public required string ContextName { get; init; }
+    public int SwitchCount { get; init; }
+    public int UniqueAppCount { get; init; }
+    public DateTime CreatedUtc { get; init; } = DateTime.UtcNow;
+
+    public TimeSpan PlannedDuration => TimeSpan.FromSeconds(PlannedDurationSeconds);
+    public TimeSpan ActualDuration => TimeSpan.FromSeconds(ActualDurationSeconds);
+}
+
+public record UserContext
+{
+    public long Id { get; init; }
+    public required string Name { get; init; }
+    public DateTime CreatedUtc { get; init; } = DateTime.UtcNow;
+    public DateTime UpdatedUtc { get; init; } = DateTime.UtcNow;
+}
+
+public record AppContextMapping
+{
+    public required string AppKey { get; init; }
+    public long ContextId { get; init; }
+    public DateTime CreatedUtc { get; init; } = DateTime.UtcNow;
+}
+
+public record PatternPreference
+{
+    public BehavioralPatternType PatternType { get; init; }
+    public PatternVisibility Visibility { get; init; } = PatternVisibility.Show;
+    public DateTime UpdatedUtc { get; init; } = DateTime.UtcNow;
+}
+
+public record PatternEvidence
+{
+    public BehavioralPatternType PatternType { get; init; }
+    public DateTime StartUtc { get; init; }
+    public DateTime EndUtc { get; init; }
+    public int SwitchCount { get; init; }
+    public int DistinctApplicationCount { get; init; }
+    public int SessionDurationSeconds { get; init; }
+    public int ReopenCount { get; init; }
+    public double SwitchesPerMinute => (EndUtc > StartUtc) ? SwitchCount / (EndUtc - StartUtc).TotalMinutes : 0;
+
+    public bool RuleTriggered { get; init; }
+    public required string RuleEvidence { get; init; }
+    public bool ModelSupported { get; init; }
+    public float ModelConfidence { get; init; }
+    public ConfidenceCategory ConfidenceCategory { get; init; } = ConfidenceCategory.Moderate;
+
+    public required string Explanation { get; init; }
+}
+
+public record DataInventoryCounts(
+    long SessionCount,
+    long IdlePeriodCount,
+    long SwitchEventCount,
+    long PatternEventCount,
+    long DailyMetricsCount,
+    long FlowSessionCount,
+    long FocusSessionCount,
+    long SettingsCount,
+    long CategoryOverrideCount,
+    long DatabaseSizeBytes
+);
+
+public record PatternAgreementDiagnostics(
+    int TotalEvaluations,
+    int RuleAndModelAgreedCount,
+    int RuleOnlyCount,
+    int ModelOnlyCount,
+    int DisagreementCount,
+    int UncertainCount,
+    double RuleAndModelAgreementRate,
+    double RuleOnlyRate,
+    double ModelOnlyRate,
+    double DisagreementRate,
+    double UncertainRate
+);
+
+
 

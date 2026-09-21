@@ -62,4 +62,9 @@ public interface ITrackingCoordinator
     void Stop();
     void Pause(TimeSpan? duration = null);
     void Resume();
+
+    TrackingMode TrackingMode { get; }
+    IReadOnlySet<string> SelectedTrackedApps { get; }
+    IReadOnlySet<string> SelectedTrackedCategories { get; }
+    void SetTrackingMode(TrackingMode mode, IEnumerable<string>? selectedApps = null, IEnumerable<string>? selectedCategories = null);
 }

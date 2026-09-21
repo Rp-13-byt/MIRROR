@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Mirror_App.Services;
@@ -17,27 +17,43 @@ public sealed partial class PrivacyPage : Page
         DataContext = ViewModel;
     }
 
+    private async void OnRunAuditClicked(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.RunPrivacyAuditCommand.ExecuteAsync(null);
+    }
+
+    private async void OnRefreshInventoryClicked(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.RefreshDataInventoryCommand.ExecuteAsync(null);
+    }
+
     private async void OnExportCsvClicked(object sender, RoutedEventArgs e)
     {
         await ViewModel.ExportToCsvCommand.ExecuteAsync(null);
-        TxtStatusMessage.Text = ViewModel.StatusMessage;
     }
 
     private async void OnExportJsonClicked(object sender, RoutedEventArgs e)
     {
         await ViewModel.ExportToJsonCommand.ExecuteAsync(null);
-        TxtStatusMessage.Text = ViewModel.StatusMessage;
     }
 
-    private void OnDeleteTodayClicked(object sender, RoutedEventArgs e)
+    private async void OnDeleteTodayClicked(object sender, RoutedEventArgs e)
     {
-        ViewModel.DeleteTodayDataCommand.Execute(null);
-        TxtStatusMessage.Text = ViewModel.StatusMessage;
+        await ViewModel.DeleteTodayDataCommand.ExecuteAsync(null);
     }
 
     private void OnPurgeAllClicked(object sender, RoutedEventArgs e)
     {
-        ViewModel.PurgeAllDataCommand.Execute(null);
-        TxtStatusMessage.Text = ViewModel.StatusMessage;
+        ViewModel.RequestPurgePreviewCommand.Execute(null);
+    }
+
+    private async void OnConfirmPurgeClicked(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.PurgeAllDataCommand.ExecuteAsync(null);
+    }
+
+    private void OnCancelPurgeClicked(object sender, RoutedEventArgs e)
+    {
+        ViewModel.CancelPurgeCommand.Execute(null);
     }
 }

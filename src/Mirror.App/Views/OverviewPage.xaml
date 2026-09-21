@@ -78,6 +78,45 @@
                 </Grid>
             </Border>
 
+            <!-- Focus Session Completion Banner -->
+            <Border Background="#15107C41" BorderBrush="#33107C41" BorderThickness="1" CornerRadius="8" Padding="14" Visibility="{Binding FocusCompletionVisibility, Mode=OneWay}">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <FontIcon Grid.Column="0" Glyph="&#xE73E;" FontSize="18" Foreground="#107C41" Margin="0,0,12,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding FocusCompletionMessage, Mode=OneWay}" FontSize="13" Foreground="#107C41" VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Content="Dismiss" Command="{Binding DismissFocusCompletionCommand}" Background="Transparent" BorderThickness="0" Foreground="#888888" />
+                </Grid>
+            </Border>
+
+            <!-- Focus Session Control Card -->
+            <Border Background="#0CFFFFFF" BorderBrush="#22888888" BorderThickness="1" CornerRadius="10" Padding="16">
+                <Grid ColumnDefinitions="*, Auto">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE823;" FontSize="14" Foreground="#0078D4" VerticalAlignment="Center" />
+                            <TextBlock Text="Focus Session" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <Border Background="#200078D4" CornerRadius="4" Padding="6,2" Visibility="{Binding FocusActiveVisibility, Mode=OneWay}">
+                                <TextBlock Text="ACTIVE" FontSize="10" FontWeight="Bold" Foreground="#0078D4" />
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="Set an intentional focus window. Mirror logs sustained engagement and switches locally." FontSize="12" Foreground="#888888" />
+                    </StackPanel>
+
+                    <!-- Inactive State: Quick Presets -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Visibility="{Binding FocusInactiveVisibility, Mode=OneWay}">
+                        <Button Content="25m Deep Work" Command="{Binding StartFocusSessionCommand}" CommandParameter="25:Deep Work" />
+                        <Button Content="45m Study" Command="{Binding StartFocusSessionCommand}" CommandParameter="45:Study" />
+                        <Button Content="60m Coding" Command="{Binding StartFocusSessionCommand}" CommandParameter="60:Coding" />
+                    </StackPanel>
+
+                    <!-- Active State: Countdown & Complete -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Visibility="{Binding FocusActiveVisibility, Mode=OneWay}">
+                        <TextBlock Text="{Binding FocusRemainingFormatted, Mode=OneWay}" FontSize="22" FontWeight="Bold" Foreground="#0078D4" VerticalAlignment="Center" />
+                        <Button Content="Finish Session" Command="{Binding CompleteFocusSessionCommand}" Background="#20107C41" Foreground="#107C41" />
+                        <Button Content="Cancel" Command="{Binding CancelFocusSessionCommand}" Background="Transparent" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
             <!-- Metrics Cards Grid -->
             <Grid ColumnDefinitions="*, *, *, *" ColumnSpacing="16">
                 <!-- Card 1: Active Time -->

@@ -1,0 +1,172 @@
+﻿{
+    "name":  "Mirror-Windows-App-SBOM",
+    "creationInfo":  {
+                         "creators":  [
+                                          "Tool: Mirror-SBOM-Generator-1.0.0",
+                                          "Organization: Mirror Development Team"
+                                      ],
+                         "created":  "2026-09-21T15:50:05Z"
+                     },
+    "SPDXID":  "SPDXRef-DOCUMENT",
+    "spdxVersion":  "SPDX-2.3",
+    "dataLicense":  "CC0-1.0",
+    "documentNamespace":  "https://github.com/Rp-13-byt/MIRROR/spdx/1a81062c-27fa-4e97-a898-bfbc552e4330",
+    "packages":  [
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-1",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "8.3.2",
+                         "downloadLocation":  "https://www.nuget.org/packages/CommunityToolkit.Mvvm/8.3.2",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "CommunityToolkit.Mvvm",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.App.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-2",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "8.0.10",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.Data.Sqlite/8.0.10",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.Data.Sqlite",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.Persistence.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-3",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "8.0.1",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection/8.0.1",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.Extensions.DependencyInjection",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.App.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-4",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "8.0.0",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.Extensions.Hosting/8.0.0",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.Extensions.Hosting",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.Tracking.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-5",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "8.0.1",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.Extensions.Hosting/8.0.1",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.Extensions.Hosting",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.App.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-6",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "8.0.0",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.Extensions.Logging.Abstractions/8.0.0",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.Extensions.Logging.Abstractions",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.Platform.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-7",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "8.0.0",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.Extensions.Logging/8.0.0",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.Extensions.Logging",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.Tracking.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-8",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "1.19.2",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.ML.OnnxRuntime/1.19.2",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.ML.OnnxRuntime",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.Inference.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-9",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "10.0.26100.174",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.Windows.SDK.BuildTools/10.0.26100.174",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.Windows.SDK.BuildTools",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.App.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-10",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "1.6.241114003",
+                         "downloadLocation":  "https://www.nuget.org/packages/Microsoft.WindowsAppSDK/1.6.241114003",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "Microsoft.WindowsAppSDK",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.App.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-11",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "2026.9.0",
+                         "downloadLocation":  "https://www.nuget.org/packages/QuestPDF/2026.9.0",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "QuestPDF",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.Reporting.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-12",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "4.5.3",
+                         "downloadLocation":  "https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe/4.5.3",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "System.Runtime.CompilerServices.Unsafe",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.App.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     },
+                     {
+                         "filesAnalyzed":  false,
+                         "SPDXID":  "SPDXRef-Package-13",
+                         "copyrightText":  "NOASSERTION",
+                         "versionInfo":  "10.0.12",
+                         "downloadLocation":  "https://www.nuget.org/packages/System.Speech/10.0.12",
+                         "licenseDeclared":  "NOASSERTION",
+                         "name":  "System.Speech",
+                         "supplier":  "Organization: NuGet.org",
+                         "comment":  "Utilized by: Mirror.Voice.csproj",
+                         "licenseConcluded":  "NOASSERTION"
+                     }
+                 ]
+}

@@ -21,6 +21,7 @@ public class InferenceBackendManager : IInferenceBackendManager
     public double SteadyStateP50Ms { get; private set; }
     public double SteadyStateP95Ms { get; private set; }
     public ModelMetadata? CurrentModelMetadata { get; private set; }
+    public float AbstentionThreshold { get; set; } = 0.60f;
 
     public async Task InitializeAsync(string modelDirectory, CancellationToken ct = default)
     {
@@ -122,6 +123,16 @@ public class InferenceBackendManager : IInferenceBackendManager
             SteadyStateP50Ms = sorted[sorted.Count / 2];
             int p95Idx = (int)Math.Floor(sorted.Count * 0.95);
             SteadyStateP95Ms = sorted[Math.Clamp(p95Idx, 0, sorted.Count - 1)];
+        }
+
+        if (result.Confidence < AbstentionThreshold)
+        {
+            result = result with
+            {
+                IsUncertain = true,
+                DetectedPattern = BehavioralPatternType.Uncertain,
+                AbstentionReason = $"Confidence ({result.Confidence:P0}) below certainty threshold ({AbstentionThreshold:P0})"
+            };
         }
 
         return result;

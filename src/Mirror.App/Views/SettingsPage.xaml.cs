@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Mirror_App.Services;
@@ -29,6 +29,15 @@ public sealed partial class SettingsPage : Page
         ViewModel.EnableNpuAcceleration = ToggleNpu.IsOn;
         ViewModel.SaveSettingsCommand.Execute(null);
         TxtSettingsStatus.Text = ViewModel.SaveMessage;
+    }
+
+    private void OnTrackingModeChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ComboTrackingMode != null && ComboTrackingMode.SelectedIndex >= 0)
+        {
+            ViewModel.SetTrackingModeCommand.Execute(ComboTrackingMode.SelectedIndex);
+            TxtSettingsStatus.Text = ViewModel.SaveMessage;
+        }
     }
 
     private void OnAddExclusionClicked(object sender, RoutedEventArgs e)

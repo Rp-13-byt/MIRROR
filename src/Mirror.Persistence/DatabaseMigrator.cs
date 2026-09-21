@@ -51,6 +51,12 @@ public class DatabaseMigrator
             ApplyMigration2(connection, transaction);
         }
 
+        // Apply migration 3 if needed
+        if (currentVersion < 3)
+        {
+            ApplyMigration3(connection, transaction);
+        }
+
         transaction.Commit();
     }
 
@@ -202,5 +208,69 @@ public class DatabaseMigrator
         ";
         cmd.ExecuteNonQuery();
     }
+
+    private static void ApplyMigration3(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        using var cmd = connection.CreateCommand();
+        cmd.Transaction = transaction;
+        cmd.CommandText = @"
+            -- Focus Sessions
+            CREATE TABLE IF NOT EXISTS focus_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                start_utc TEXT NOT NULL,
+                end_utc TEXT NOT NULL,
+                planned_duration_seconds INTEGER NOT NULL,
+                actual_duration_seconds INTEGER NOT NULL,
+                context_name TEXT NOT NULL,
+                switch_count INTEGER NOT NULL,
+                unique_app_count INTEGER NOT NULL,
+                created_utc TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_focus_start_utc ON focus_sessions(start_utc);
+
+            -- User Contexts
+            CREATE TABLE IF NOT EXISTS user_contexts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                created_utc TEXT NOT NULL,
+                updated_utc TEXT NOT NULL
+            );
+
+            -- App Context Mappings
+            CREATE TABLE IF NOT EXISTS app_context_mappings (
+                app_key TEXT PRIMARY KEY,
+                context_id INTEGER NOT NULL,
+                created_utc TEXT NOT NULL
+            );
+
+            -- Pattern Preferences
+            CREATE TABLE IF NOT EXISTS pattern_preferences (
+                pattern_type TEXT PRIMARY KEY,
+                visibility TEXT NOT NULL,
+                updated_utc TEXT NOT NULL
+            );
+
+            -- Crash & Heartbeat State
+            CREATE TABLE IF NOT EXISTS crash_state (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                last_heartbeat_utc TEXT NOT NULL,
+                is_clean_shutdown INTEGER NOT NULL
+            );
+            INSERT OR IGNORE INTO crash_state (id, last_heartbeat_utc, is_clean_shutdown)
+            VALUES (1, datetime('now'), 1);
+
+            -- Default Contexts
+            INSERT OR IGNORE INTO user_contexts (name, created_utc, updated_utc) VALUES ('Coding', datetime('now'), datetime('now'));
+            INSERT OR IGNORE INTO user_contexts (name, created_utc, updated_utc) VALUES ('Study', datetime('now'), datetime('now'));
+            INSERT OR IGNORE INTO user_contexts (name, created_utc, updated_utc) VALUES ('Projects', datetime('now'), datetime('now'));
+            INSERT OR IGNORE INTO user_contexts (name, created_utc, updated_utc) VALUES ('Personal', datetime('now'), datetime('now'));
+
+            -- Record Migration
+            INSERT INTO schema_migrations (version, description, applied_utc)
+            VALUES (3, 'Add focus sessions, user contexts, pattern preferences, and crash recovery state', datetime('now'));
+        ";
+        cmd.ExecuteNonQuery();
+    }
 }
+
 

@@ -102,6 +102,47 @@ public sealed partial class OverviewViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _narrationIcon = "\uE767";
 
+    // Focus Session Controls
+    [ObservableProperty]
+    private bool _isFocusSessionActive = false;
+
+    [ObservableProperty]
+    private string _focusRemainingFormatted = "25:00";
+
+    [ObservableProperty]
+    private string _focusContextName = "Deep Work";
+
+    [ObservableProperty]
+    private int _focusPlannedMinutes = 25;
+
+    [ObservableProperty]
+    private int _focusSessionSwitches = 0;
+
+    [ObservableProperty]
+    private string _focusCompletionMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasFocusCompletionMessage = false;
+
+    public Microsoft.UI.Xaml.Visibility FocusCompletionVisibility => HasFocusCompletionMessage ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+    public Microsoft.UI.Xaml.Visibility FocusActiveVisibility => IsFocusSessionActive ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+    public Microsoft.UI.Xaml.Visibility FocusInactiveVisibility => IsFocusSessionActive ? Microsoft.UI.Xaml.Visibility.Collapsed : Microsoft.UI.Xaml.Visibility.Visible;
+
+    partial void OnIsFocusSessionActiveChanged(bool value)
+    {
+        OnPropertyChanged(nameof(FocusActiveVisibility));
+        OnPropertyChanged(nameof(FocusInactiveVisibility));
+    }
+
+    partial void OnHasFocusCompletionMessageChanged(bool value)
+    {
+        OnPropertyChanged(nameof(FocusCompletionVisibility));
+    }
+
+    private DateTime _focusStartUtc;
+    private DateTime _focusEndUtc;
+    private readonly System.Collections.Generic.HashSet<string> _focusAppsUsed = new(StringComparer.OrdinalIgnoreCase);
+
     public ObservableCollection<CategoryDisplayItem> Categories { get; } = new();
     public ObservableCollection<AppDisplayItem> TopApplications { get; } = new();
     public ObservableCollection<PatternDisplayItem> RecentPatterns { get; } = new();
@@ -185,6 +226,24 @@ public sealed partial class OverviewViewModel : ObservableObject, IDisposable
             CurrentSessionElapsed = "00:00:00";
             TotalActiveTime = FormatTotalTime(_completedActiveSecondsToday);
         }
+
+        // Focus session countdown
+        if (IsFocusSessionActive)
+        {
+            var remaining = _focusEndUtc - DateTime.UtcNow;
+            if (remaining <= TimeSpan.Zero)
+            {
+                _ = CompleteFocusSessionAsync();
+            }
+            else
+            {
+                FocusRemainingFormatted = $"{(int)remaining.TotalMinutes:D2}:{remaining.Seconds:D2}";
+                if (_trackingCoordinator.CurrentApp != null)
+                {
+                    _focusAppsUsed.Add(_trackingCoordinator.CurrentApp.AppKey);
+                }
+            }
+        }
     }
 
     private void OnSessionRecorded(object? sender, ActivitySession session)
@@ -194,7 +253,88 @@ public sealed partial class OverviewViewModel : ObservableObject, IDisposable
 
     private void OnForegroundAppChanged(object? sender, AppIdentity? identity)
     {
+        if (IsFocusSessionActive)
+        {
+            FocusSessionSwitches++;
+            if (identity != null)
+            {
+                _focusAppsUsed.Add(identity.AppKey);
+            }
+        }
         _dispatcherQueue?.TryEnqueue(LoadData);
+    }
+
+    [RelayCommand]
+    public void StartFocusSession(string contextWithMinutes)
+    {
+        int minutes = 25;
+        string name = "Deep Work";
+        if (!string.IsNullOrWhiteSpace(contextWithMinutes) && contextWithMinutes.Contains(':'))
+        {
+            var parts = contextWithMinutes.Split(':');
+            if (int.TryParse(parts[0], out int m)) minutes = m;
+            if (parts.Length > 1) name = parts[1];
+        }
+
+        FocusPlannedMinutes = minutes;
+        FocusContextName = name;
+        _focusStartUtc = DateTime.UtcNow;
+        _focusEndUtc = _focusStartUtc.AddMinutes(minutes);
+        _focusAppsUsed.Clear();
+        if (_trackingCoordinator.CurrentApp != null) _focusAppsUsed.Add(_trackingCoordinator.CurrentApp.AppKey);
+
+        IsFocusSessionActive = true;
+        HasFocusCompletionMessage = false;
+        FocusSessionSwitches = 0;
+        FocusRemainingFormatted = $"{minutes:D2}:00";
+    }
+
+    [RelayCommand]
+    public async Task CompleteFocusSessionAsync()
+    {
+        if (!IsFocusSessionActive) return;
+        IsFocusSessionActive = false;
+
+        var actualDuration = DateTime.UtcNow - _focusStartUtc;
+        int actualSeconds = Math.Max(1, (int)actualDuration.TotalSeconds);
+        int switches = FocusSessionSwitches;
+        int uniqueApps = Math.Max(1, _focusAppsUsed.Count);
+
+        var session = new FocusSession
+        {
+            StartUtc = _focusStartUtc,
+            EndUtc = DateTime.UtcNow,
+            PlannedDurationSeconds = FocusPlannedMinutes * 60,
+            ActualDurationSeconds = actualSeconds,
+            ContextName = FocusContextName,
+            SwitchCount = switches,
+            UniqueAppCount = uniqueApps
+        };
+
+        try
+        {
+            await _repository.InsertFocusSessionAsync(session);
+        }
+        catch { }
+
+        int minutesCompleted = Math.Max(1, (int)actualDuration.TotalMinutes);
+        FocusCompletionMessage = $"Focus period complete: {minutesCompleted} minutes logged with {switches} switches across {uniqueApps} applications.";
+        HasFocusCompletionMessage = true;
+    }
+
+    [RelayCommand]
+    public void CancelFocusSession()
+    {
+        IsFocusSessionActive = false;
+        FocusRemainingFormatted = "00:00";
+        HasFocusCompletionMessage = false;
+    }
+
+    [RelayCommand]
+    public void DismissFocusCompletion()
+    {
+        HasFocusCompletionMessage = false;
+        FocusCompletionMessage = string.Empty;
     }
 
     [RelayCommand]

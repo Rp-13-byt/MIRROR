@@ -149,6 +149,58 @@ public class BaselineAnalyzerTests
             RecalibratedThresholds.Clear();
             return Task.CompletedTask;
         }
+
+        public List<FocusSession> FocusSessions { get; } = new();
+        public Task InsertFocusSessionAsync(FocusSession session, CancellationToken ct = default)
+        {
+            FocusSessions.Add(session);
+            return Task.CompletedTask;
+        }
+        public Task<IReadOnlyList<FocusSession>> GetFocusSessionsAsync(DateTime startUtc, DateTime endUtc, CancellationToken ct = default)
+            => Task.FromResult<IReadOnlyList<FocusSession>>(FocusSessions.Where(f => f.StartUtc >= startUtc && f.EndUtc <= endUtc).ToList());
+
+        public List<UserContext> UserContexts { get; } = new();
+        public Task<IReadOnlyList<UserContext>> GetUserContextsAsync(CancellationToken ct = default)
+            => Task.FromResult<IReadOnlyList<UserContext>>(UserContexts);
+        public Task<long> InsertUserContextAsync(string name, CancellationToken ct = default)
+        {
+            var ctx = new UserContext { Id = UserContexts.Count + 1, Name = name, CreatedUtc = DateTime.UtcNow };
+            UserContexts.Add(ctx);
+            return Task.FromResult(ctx.Id);
+        }
+        public Task DeleteUserContextAsync(long contextId, CancellationToken ct = default)
+        {
+            UserContexts.RemoveAll(c => c.Id == contextId);
+            return Task.CompletedTask;
+        }
+
+        public Dictionary<string, long> AppContextMappings { get; } = new();
+        public Task AssignAppContextAsync(string appKey, long contextId, CancellationToken ct = default)
+        {
+            AppContextMappings[appKey] = contextId;
+            return Task.CompletedTask;
+        }
+        public Task<long?> GetAppContextAsync(string appKey, CancellationToken ct = default)
+            => Task.FromResult(AppContextMappings.TryGetValue(appKey, out var id) ? (long?)id : null);
+
+        public Dictionary<BehavioralPatternType, PatternVisibility> PatternPreferences { get; } = new();
+        public Task<IReadOnlyList<PatternPreference>> GetPatternPreferencesAsync(CancellationToken ct = default)
+            => Task.FromResult<IReadOnlyList<PatternPreference>>(PatternPreferences.Select(p => new PatternPreference { PatternType = p.Key, Visibility = p.Value, UpdatedUtc = DateTime.UtcNow }).ToList());
+        public Task SavePatternPreferenceAsync(BehavioralPatternType patternType, PatternVisibility visibility, CancellationToken ct = default)
+        {
+            PatternPreferences[patternType] = visibility;
+            return Task.CompletedTask;
+        }
+
+        public Task<DataInventoryCounts> GetDataInventoryCountsAsync(CancellationToken ct = default)
+            => Task.FromResult(new DataInventoryCounts(0, 0, 0, 0, 0, 0, 0, 1, 0, 0));
+        public Task<bool> CheckDatabaseIntegrityAsync(CancellationToken ct = default)
+            => Task.FromResult(true);
+
+        public Task RecordHeartbeatAsync(bool isCleanShutdown, CancellationToken ct = default)
+            => Task.CompletedTask;
+        public Task<bool> WasLastShutdownCleanAsync(CancellationToken ct = default)
+            => Task.FromResult(true);
     }
 
     [Fact]

@@ -7,6 +7,7 @@ using Mirror.Inference;
 using Mirror.Persistence;
 using Mirror.Platform;
 using Mirror.Security;
+using Mirror.Security.Privacy;
 using Mirror.Tracking;
 using Mirror_App.ViewModels;
 
@@ -33,7 +34,14 @@ public static class AppServices
         services.AddSingleton<IMirrorRepository, MirrorRepository>();
         services.AddSingleton<IExportService, ExportService>();
 
-        // Tracking & Security
+        // Privacy Enforcement Gate & Security
+        services.AddSingleton<ForbiddenFieldGuard>();
+        services.AddSingleton<ActivitySanitizer>();
+        services.AddSingleton<IPrivacyEnforcementGate, PrivacyEnforcementGate>();
+        services.AddSingleton<PrivacyAuditService>();
+        services.AddSingleton<IPrivacyGuard, PrivacyGuard>();
+
+        // Tracking
         services.AddSingleton<IForegroundWindowMonitor, ForegroundWindowMonitor>();
         services.AddSingleton<IProcessResolver, ProcessResolver>();
         services.AddSingleton<IApplicationIdentityResolver, ApplicationIdentityResolver>();
@@ -50,6 +58,7 @@ public static class AppServices
         services.AddSingleton<IFlowStateDetector, FlowStateDetector>();
         services.AddSingleton<IAdaptiveBaselineService, AdaptiveBaselineService>();
         services.AddSingleton<IThresholdRecalibrator, ThresholdRecalibrator>();
+        services.AddSingleton<IInsightExplorerService, InsightExplorerService>();
 
         // Wallet & Security
         services.AddSingleton<IWalletService>(sp => new WalletService(sp.GetRequiredService<IMirrorRepository>(), dbPath));

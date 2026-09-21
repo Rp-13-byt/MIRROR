@@ -36,5 +36,39 @@ public enum BehavioralPatternType
     ExtendedSingleAppSession,
     LateNightUsageSpike,
     RapidReopenPattern,
-    CompositeScrollLike
+    CompositeScrollLike,
+    Uncertain,
+    LateNightUnwindPattern = LateNightUsageSpike
 }
+
+public enum TrackingMode
+{
+    TrackAll,
+    TrackSelectedApps,
+    TrackSelectedCategories
+}
+
+public enum PatternVisibility
+{
+    Show,
+    Hide,
+    DisabledByUser
+}
+
+public enum PowerMode
+{
+    Balanced,
+    LowPower,
+    Performance
+}
+
+public enum ConfidenceCategory
+{
+    Strong,
+    Moderate,
+    Weak,
+    Uncertain,
+    High = Strong,
+    Tentative = Weak
+}
+

@@ -12,6 +12,7 @@ public class TrackingCoordinator : ITrackingCoordinator, IAsyncDisposable
     private readonly IIdleDetector _idleDetector;
     private readonly ISessionBuilder _sessionBuilder;
     private readonly IMirrorRepository _repository;
+    private readonly IPrivacyEnforcementGate? _privacyGate;
     private readonly IPatternDetector? _patternDetector;
     private readonly IPatternFusionEngine? _fusionEngine;
     private readonly IInferenceBackendManager? _inferenceBackend;
@@ -25,6 +26,32 @@ public class TrackingCoordinator : ITrackingCoordinator, IAsyncDisposable
     private AppIdentity? _currentApp;
     private DateTime? _pauseUntilUtc;
     private TimeSpan _idleThreshold = TimeSpan.FromSeconds(120);
+
+    private TrackingMode _trackingMode = TrackingMode.TrackAll;
+    private readonly HashSet<string> _selectedTrackedApps = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _selectedTrackedCategories = new(StringComparer.OrdinalIgnoreCase);
+
+    public TrackingMode TrackingMode => _trackingMode;
+    public IReadOnlySet<string> SelectedTrackedApps => _selectedTrackedApps;
+    public IReadOnlySet<string> SelectedTrackedCategories => _selectedTrackedCategories;
+
+    public void SetTrackingMode(TrackingMode mode, IEnumerable<string>? selectedApps = null, IEnumerable<string>? selectedCategories = null)
+    {
+        lock (_stateLock)
+        {
+            _trackingMode = mode;
+            _selectedTrackedApps.Clear();
+            if (selectedApps != null)
+            {
+                foreach (var app in selectedApps) _selectedTrackedApps.Add(app);
+            }
+            _selectedTrackedCategories.Clear();
+            if (selectedCategories != null)
+            {
+                foreach (var cat in selectedCategories) _selectedTrackedCategories.Add(cat);
+            }
+        }
+    }
 
     public TrackingState CurrentState
     {
@@ -88,6 +115,7 @@ public class TrackingCoordinator : ITrackingCoordinator, IAsyncDisposable
         IIdleDetector idleDetector,
         ISessionBuilder sessionBuilder,
         IMirrorRepository repository,
+        IPrivacyEnforcementGate? privacyGate = null,
         IPatternDetector? patternDetector = null,
         IPatternFusionEngine? fusionEngine = null,
         IInferenceBackendManager? inferenceBackend = null,
@@ -99,6 +127,7 @@ public class TrackingCoordinator : ITrackingCoordinator, IAsyncDisposable
         _idleDetector = idleDetector;
         _sessionBuilder = sessionBuilder;
         _repository = repository;
+        _privacyGate = privacyGate;
         _patternDetector = patternDetector;
         _fusionEngine = fusionEngine;
         _inferenceBackend = inferenceBackend;
@@ -176,14 +205,61 @@ public class TrackingCoordinator : ITrackingCoordinator, IAsyncDisposable
     {
         if (CurrentState != TrackingState.Running) return;
 
-        var identity = _identityResolver.ResolveIdentity(info.ProcessName);
+        // Route through Privacy Enforcement Gate if available, or fallback to identity resolver
+        CanonicalActivityEvent? canonical = null;
+        if (_privacyGate != null)
+        {
+            canonical = _privacyGate.SanitizeAndFilter(info.ProcessName, info.TimestampUtc);
+        }
+        else
+        {
+            var rawId = _identityResolver.ResolveIdentity(info.ProcessName);
+            if (!rawId.IsExcluded)
+            {
+                canonical = new CanonicalActivityEvent(rawId.AppKey, rawId.DisplayName, rawId.Category, info.TimestampUtc);
+            }
+        }
+
+        if (canonical == null)
+        {
+            // Excluded app: ensure sessionizer receives excluded identity so no session is recorded
+            var excludedIdentity = new AppIdentity("excluded", "Excluded", "Excluded", IsExcluded: true);
+            lock (_stateLock) { _currentApp = null; }
+            ForegroundAppChanged?.Invoke(this, null);
+            _sessionBuilder.OnForegroundAppChanged(excludedIdentity, info.TimestampUtc);
+            return;
+        }
+
+        // Check tracking mode filtering
+        lock (_stateLock)
+        {
+            if (_trackingMode == TrackingMode.TrackSelectedApps && !_selectedTrackedApps.Contains(canonical.AppKey))
+            {
+                var untracked = new AppIdentity(canonical.AppKey, canonical.DisplayName, canonical.Category, IsExcluded: true);
+                _currentApp = null;
+                ForegroundAppChanged?.Invoke(this, null);
+                _sessionBuilder.OnForegroundAppChanged(untracked, canonical.TimestampUtc);
+                return;
+            }
+
+            if (_trackingMode == TrackingMode.TrackSelectedCategories && !_selectedTrackedCategories.Contains(canonical.Category))
+            {
+                var untracked = new AppIdentity(canonical.AppKey, canonical.DisplayName, canonical.Category, IsExcluded: true);
+                _currentApp = null;
+                ForegroundAppChanged?.Invoke(this, null);
+                _sessionBuilder.OnForegroundAppChanged(untracked, canonical.TimestampUtc);
+                return;
+            }
+        }
+
+        var identity = new AppIdentity(canonical.AppKey, canonical.DisplayName, canonical.Category, IsExcluded: false);
         lock (_stateLock)
         {
             _currentApp = identity;
         }
 
         ForegroundAppChanged?.Invoke(this, identity);
-        _sessionBuilder.OnForegroundAppChanged(identity, info.TimestampUtc);
+        _sessionBuilder.OnForegroundAppChanged(identity, canonical.TimestampUtc);
     }
 
     private void CheckIdleState(object? state)

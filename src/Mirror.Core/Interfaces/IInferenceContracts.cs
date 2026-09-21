@@ -22,6 +22,7 @@ public interface IInferenceBackendManager : IAsyncDisposable
     double SteadyStateP50Ms { get; }
     double SteadyStateP95Ms { get; }
     ModelMetadata? CurrentModelMetadata { get; }
+    float AbstentionThreshold { get; set; }
 
     Task InitializeAsync(string modelDirectory, CancellationToken ct = default);
     Task<InferenceResult> PredictAsync(FeatureSequence sequence, CancellationToken ct = default);

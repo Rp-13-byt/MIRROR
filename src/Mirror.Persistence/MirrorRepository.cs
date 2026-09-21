@@ -722,6 +722,267 @@ public class MirrorRepository : IMirrorRepository
         return Task.FromResult(0L);
     }
 
+    // --- Focus Sessions ---
+    public async Task InsertFocusSessionAsync(FocusSession session, CancellationToken ct = default)
+    {
+        _privacyGuard.ValidateSafeEntity(session);
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO focus_sessions (start_utc, end_utc, planned_duration_seconds, actual_duration_seconds, context_name, switch_count, unique_app_count, created_utc)
+            VALUES (@start, @end, @planned, @actual, @context, @switches, @apps, @created);
+        ";
+        cmd.Parameters.AddWithValue("@start", session.StartUtc.ToString("o"));
+        cmd.Parameters.AddWithValue("@end", session.EndUtc.ToString("o"));
+        cmd.Parameters.AddWithValue("@planned", session.PlannedDurationSeconds);
+        cmd.Parameters.AddWithValue("@actual", session.ActualDurationSeconds);
+        cmd.Parameters.AddWithValue("@context", session.ContextName);
+        cmd.Parameters.AddWithValue("@switches", session.SwitchCount);
+        cmd.Parameters.AddWithValue("@apps", session.UniqueAppCount);
+        cmd.Parameters.AddWithValue("@created", session.CreatedUtc.ToString("o"));
+        await cmd.ExecuteNonQueryAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<FocusSession>> GetFocusSessionsAsync(DateTime startUtc, DateTime endUtc, CancellationToken ct = default)
+    {
+        var list = new List<FocusSession>();
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            SELECT id, start_utc, end_utc, planned_duration_seconds, actual_duration_seconds, context_name, switch_count, unique_app_count, created_utc
+            FROM focus_sessions
+            WHERE start_utc >= @start AND end_utc <= @end
+            ORDER BY start_utc DESC;
+        ";
+        cmd.Parameters.AddWithValue("@start", startUtc.ToString("o"));
+        cmd.Parameters.AddWithValue("@end", endUtc.ToString("o"));
+
+        using var reader = await cmd.ExecuteReaderAsync(ct);
+        while (await reader.ReadAsync(ct))
+        {
+            list.Add(new FocusSession
+            {
+                Id = reader.GetInt64(0),
+                StartUtc = DateTime.Parse(reader.GetString(1)),
+                EndUtc = DateTime.Parse(reader.GetString(2)),
+                PlannedDurationSeconds = reader.GetInt32(3),
+                ActualDurationSeconds = reader.GetInt32(4),
+                ContextName = reader.GetString(5),
+                SwitchCount = reader.GetInt32(6),
+                UniqueAppCount = reader.GetInt32(7),
+                CreatedUtc = DateTime.Parse(reader.GetString(8))
+            });
+        }
+        return list;
+    }
+
+    // --- User Contexts ---
+    public async Task<IReadOnlyList<UserContext>> GetUserContextsAsync(CancellationToken ct = default)
+    {
+        var list = new List<UserContext>();
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT id, name, created_utc, updated_utc FROM user_contexts ORDER BY name ASC;";
+
+        using var reader = await cmd.ExecuteReaderAsync(ct);
+        while (await reader.ReadAsync(ct))
+        {
+            list.Add(new UserContext
+            {
+                Id = reader.GetInt64(0),
+                Name = reader.GetString(1),
+                CreatedUtc = DateTime.Parse(reader.GetString(2)),
+                UpdatedUtc = DateTime.Parse(reader.GetString(3))
+            });
+        }
+        return list;
+    }
+
+    public async Task<long> InsertUserContextAsync(string name, CancellationToken ct = default)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO user_contexts (name, created_utc, updated_utc)
+            VALUES (@name, datetime('now'), datetime('now'));
+            SELECT last_insert_rowid();
+        ";
+        cmd.Parameters.AddWithValue("@name", name);
+        var result = await cmd.ExecuteScalarAsync(ct);
+        return Convert.ToInt64(result);
+    }
+
+    public async Task DeleteUserContextAsync(long contextId, CancellationToken ct = default)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            DELETE FROM user_contexts WHERE id = @id;
+            DELETE FROM app_context_mappings WHERE context_id = @id;
+        ";
+        cmd.Parameters.AddWithValue("@id", contextId);
+        await cmd.ExecuteNonQueryAsync(ct);
+    }
+
+    public async Task AssignAppContextAsync(string appKey, long contextId, CancellationToken ct = default)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO app_context_mappings (app_key, context_id, created_utc)
+            VALUES (@appKey, @contextId, datetime('now'))
+            ON CONFLICT(app_key) DO UPDATE SET context_id = excluded.context_id;
+        ";
+        cmd.Parameters.AddWithValue("@appKey", appKey);
+        cmd.Parameters.AddWithValue("@contextId", contextId);
+        await cmd.ExecuteNonQueryAsync(ct);
+    }
+
+    public async Task<long?> GetAppContextAsync(string appKey, CancellationToken ct = default)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT context_id FROM app_context_mappings WHERE app_key = @appKey;";
+        cmd.Parameters.AddWithValue("@appKey", appKey);
+        var result = await cmd.ExecuteScalarAsync(ct);
+        return result != null && result != DBNull.Value ? Convert.ToInt64(result) : null;
+    }
+
+    // --- Pattern Preferences ---
+    public async Task<IReadOnlyList<PatternPreference>> GetPatternPreferencesAsync(CancellationToken ct = default)
+    {
+        var list = new List<PatternPreference>();
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT pattern_type, visibility, updated_utc FROM pattern_preferences;";
+
+        using var reader = await cmd.ExecuteReaderAsync(ct);
+        while (await reader.ReadAsync(ct))
+        {
+            if (Enum.TryParse<BehavioralPatternType>(reader.GetString(0), out var pType) &&
+                Enum.TryParse<PatternVisibility>(reader.GetString(1), out var vis))
+            {
+                list.Add(new PatternPreference
+                {
+                    PatternType = pType,
+                    Visibility = vis,
+                    UpdatedUtc = DateTime.Parse(reader.GetString(2))
+                });
+            }
+        }
+        return list;
+    }
+
+    public async Task SavePatternPreferenceAsync(BehavioralPatternType patternType, PatternVisibility visibility, CancellationToken ct = default)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO pattern_preferences (pattern_type, visibility, updated_utc)
+            VALUES (@type, @vis, datetime('now'))
+            ON CONFLICT(pattern_type) DO UPDATE SET visibility = excluded.visibility, updated_utc = excluded.updated_utc;
+        ";
+        cmd.Parameters.AddWithValue("@type", patternType.ToString());
+        cmd.Parameters.AddWithValue("@vis", visibility.ToString());
+        await cmd.ExecuteNonQueryAsync(ct);
+    }
+
+    // --- Data Inventory & Health ---
+    public async Task<DataInventoryCounts> GetDataInventoryCountsAsync(CancellationToken ct = default)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+
+        async Task<long> CountTable(string tableName)
+        {
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = $"SELECT COUNT(*) FROM {tableName};";
+                var res = await cmd.ExecuteScalarAsync(ct);
+                return Convert.ToInt64(res);
+            }
+            catch
+            {
+                return 0L;
+            }
+        }
+
+        long sCount = await CountTable("activity_sessions");
+        long iCount = await CountTable("idle_periods");
+        long swCount = await CountTable("app_switch_events");
+        long pCount = await CountTable("pattern_events");
+        long dCount = await CountTable("daily_metrics");
+        long flCount = await CountTable("flow_state_sessions");
+        long fcCount = await CountTable("focus_sessions");
+        long stCount = await CountTable("settings");
+        long coCount = await CountTable("app_category_overrides");
+        long dbSize = await GetDatabaseSizeBytesAsync(ct);
+
+        return new DataInventoryCounts(
+            SessionCount: sCount,
+            IdlePeriodCount: iCount,
+            SwitchEventCount: swCount,
+            PatternEventCount: pCount,
+            DailyMetricsCount: dCount,
+            FlowSessionCount: flCount,
+            FocusSessionCount: fcCount,
+            SettingsCount: stCount,
+            CategoryOverrideCount: coCount,
+            DatabaseSizeBytes: dbSize
+        );
+    }
+
+    public async Task<bool> CheckDatabaseIntegrityAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            using var conn = _connectionFactory.CreateConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "PRAGMA integrity_check;";
+            var result = await cmd.ExecuteScalarAsync(ct);
+            return result?.ToString()?.Equals("ok", StringComparison.OrdinalIgnoreCase) ?? false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task RecordHeartbeatAsync(bool isClean, CancellationToken ct = default)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO crash_state (id, last_heartbeat_utc, is_clean_shutdown)
+            VALUES (1, datetime('now'), @clean)
+            ON CONFLICT(id) DO UPDATE SET
+                last_heartbeat_utc = excluded.last_heartbeat_utc,
+                is_clean_shutdown = excluded.is_clean_shutdown;
+        ";
+        cmd.Parameters.AddWithValue("@clean", isClean ? 1 : 0);
+        await cmd.ExecuteNonQueryAsync(ct);
+    }
+
+    public async Task<bool> WasLastShutdownCleanAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            using var conn = _connectionFactory.CreateConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT is_clean_shutdown FROM crash_state WHERE id = 1;";
+            var result = await cmd.ExecuteScalarAsync(ct);
+            if (result != null && result != DBNull.Value)
+            {
+                return Convert.ToInt32(result) == 1;
+            }
+            return true;
+        }
+        catch
+        {
+            return true;
+        }
+    }
+
     private static ActivitySession ReadSession(SqliteDataReader reader)
     {
         return new ActivitySession

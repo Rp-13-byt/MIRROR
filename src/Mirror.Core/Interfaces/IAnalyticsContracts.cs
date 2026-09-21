@@ -60,6 +60,8 @@ public interface IPatternFusionEngine
         PatternEvent? ruleCandidate,
         InferenceResult? mlInference,
         float minimumConfidenceThreshold = 0.65f);
+
+    PatternAgreementDiagnostics GetAgreementDiagnostics();
 }
 
 public interface IFlowStateDetector
@@ -83,5 +85,11 @@ public interface IThresholdRecalibrator
     Task<double> RecalibrateThresholdAsync(BehavioralPatternType patternType, string reason, long patternEventId, CancellationToken ct = default);
     Task<IReadOnlyDictionary<string, double>> GetActiveThresholdsAsync(CancellationToken ct = default);
     Task ResetThresholdsAsync(CancellationToken ct = default);
+}
+
+public interface IInsightExplorerService
+{
+    PatternEvidence BuildEvidence(PatternEvent patternEvent, UserSettings? settings = null, UserBaseline? baseline = null);
+    IReadOnlyList<PatternEvidence> BuildEvidenceBatch(IEnumerable<PatternEvent> patternEvents, UserSettings? settings = null, UserBaseline? baseline = null);
 }
 

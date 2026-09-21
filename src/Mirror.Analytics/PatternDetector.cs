@@ -78,7 +78,10 @@ public class PatternDetector : IPatternDetector
                     RuleSignal = true,
                     ModelSignal = false,
                     ModelConfidence = 1.0f,
-                    Explanation = explanation
+                    Explanation = explanation,
+                    SwitchCount = inWindow.Count,
+                    UniqueApps = distinctApps.Count,
+                    DurationSeconds = (int)(evaluationTimeUtc - inWindow.Min(s => s.TimestampUtc)).TotalSeconds
                 };
             }
         }
@@ -115,7 +118,9 @@ public class PatternDetector : IPatternDetector
                 RuleSignal = true,
                 ModelSignal = false,
                 ModelConfidence = 1.0f,
-                Explanation = explanation
+                Explanation = explanation,
+                DurationSeconds = candidate.ActiveSeconds,
+                UniqueApps = 1
             };
         }
 
@@ -162,7 +167,9 @@ public class PatternDetector : IPatternDetector
                 RuleSignal = true,
                 ModelSignal = false,
                 ModelConfidence = 1.0f,
-                Explanation = explanation
+                Explanation = explanation,
+                DurationSeconds = (int)lateNightActiveSec,
+                LateNightMinutes = lateNightActiveMinutes
             };
         }
 
@@ -199,7 +206,10 @@ public class PatternDetector : IPatternDetector
                 RuleSignal = true,
                 ModelSignal = false,
                 ModelConfidence = 1.0f,
-                Explanation = explanation
+                Explanation = explanation,
+                SwitchCount = reopenGroup.Count(),
+                UniqueApps = 1,
+                DurationSeconds = (int)(evaluationTimeUtc - reopenGroup.Min(s => s.TimestampUtc)).TotalSeconds
             };
         }
 
@@ -252,7 +262,11 @@ public class PatternDetector : IPatternDetector
                 RuleSignal = true,
                 ModelSignal = false,
                 ModelConfidence = 1.0f,
-                Explanation = explanation
+                Explanation = explanation,
+                SwitchCount = maxReopens,
+                UniqueApps = distinctApps.Count,
+                DurationSeconds = (int)totalActiveSec,
+                LateNightMinutes = totalActiveSec / 60.0
             };
         }
 

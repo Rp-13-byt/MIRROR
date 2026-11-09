@@ -1,7 +1,6 @@
 # Mirror 🪞
 
 > **A Privacy-First, Entirely Local Digital Wellbeing Companion for Windows 11**  
-> *Engineered for Qualcomm Snapdragon X Copilot+ PCs with Qualcomm AI Hub, Hexagon NPU, DirectML, and CPU Fallback*
 
 [![Windows 11](https://img.shields.io/badge/Platform-Windows%2011%20(ARM64%20%7C%20x64)-0078D4?logo=windows11&logoColor=white)](#)
 [![100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline%20%26%20Zero--Telemetry-brightgreen)](#)
